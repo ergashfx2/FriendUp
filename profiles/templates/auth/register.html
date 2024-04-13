@@ -1,10 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block content %}
+
+<form action="" method="post" style="margin-right: 25%; margin-left: 25%">
+    {% csrf_token %}
+    <h1>Register</h1>
+    <div class="ui form">
+        <div class="ui field">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {% if form.username.errors %}
+            <p style="color: red;">{{ form.username.errors|join:", " }}</p>
+            {% endif %}
+        </div>
+        <div class="ui field">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {% if form.email.errors %}
+            <p style="color: red;">{{ form.email.errors|join:", " }}</p>
+            {% endif %}
+        </div>
+        <div class="ui field">
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            {% if form.password.errors %}
+            <p style="color: red;">{{ form.password.errors|join:", " }}</p>
+            {% endif %}
+        </div>
+        <div class="ui field">
+            {{ form.password2.label_tag }}
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+            <p style="color: red;">{{ form.password2.errors|join:", " }}</p>
+            {% endif %}
+        </div>
+        <small>Already have an account? <a href="{% url 'profiles:login' %}">Login here</a></small><br>
+        <button type="submit" class="ui primary button">Register</button>
+    </div>
+</form>
+
+{% endblock content %}

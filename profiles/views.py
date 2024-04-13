@@ -1,6 +1,7 @@
+from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Profile, Relationship
-from .forms import ProfileModelForm
+from .forms import ProfileModelForm, UserLoginForm, UserCreationForm
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -9,7 +10,32 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 def loginView(request):
-    return render(request, template_name='auth/login.html')
+    if request.method == 'POST':
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            username_or_email = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username_or_email, password=password)
+            if user is None:
+                try:
+                    user = User.objects.get(email=username_or_email)
+                    user = authenticate(request, username=user.username, password=password)
+                except User.DoesNotExist:
+                    user = None
+
+            if user is not None:
+                login(request, user)
+                return redirect('posts:main-post-view')
+            else:
+                return render(request, 'auth/login.html',
+                              {'form': form, 'error_message': 'Invalid username or password'})
+    else:
+        form = UserLoginForm()
+    return render(request, 'auth/login.html', {'form': form})
+
+def logoutView(request):
+    logout(request)
+    return redirect('home-view')
 
 @login_required
 def my_profile_view(request):
@@ -31,6 +57,20 @@ def my_profile_view(request):
     return render(request, 'profiles/myprofile.html', context)
 
 
+def CreateUserView(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            User.objects.create_user(username=username, email=email, password=password)
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            return redirect('posts:main-post-view')
+    else:
+        form = UserCreationForm()
+    return render(request, 'auth/register.html', {'form': form})
 @login_required
 def invites_received_view(request):
     profile = Profile.objects.get(user=request.user)
@@ -96,11 +136,6 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
     model = Profile
     template_name = 'profiles/detail.html'
 
-    # def get_object(self):
-    #     slug = self.kwargs.get('slug')
-    #     profile = Profile.objects.get(slug=slug)
-    #     return profile
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = User.objects.get(username__iexact=self.request.user)
@@ -123,9 +158,6 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
 class ProfileListView(LoginRequiredMixin, ListView):
     model = Profile
     template_name = 'profiles/profile_list.html'
-
-    # context_object_name = 'qs'
-
     def get_queryset(self):
         qs = Profile.objects.get_all_profiles(self.request.user)
         return qs

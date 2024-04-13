@@ -16,7 +16,7 @@ INSTALLED_APPS = [
     'profiles',
 ]
 
-LOGIN_URL = '/admin/'
+LOGIN_URL = '/login/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -28,7 +28,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'bffbook.urls'
+ROOT_URLCONF = 'FriendUp.urls'
 
 TEMPLATES = [
     {
@@ -48,7 +48,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'bffbook.wsgi.application'
+WSGI_APPLICATION = 'FriendUp.wsgi.application'
 
 
 # Database

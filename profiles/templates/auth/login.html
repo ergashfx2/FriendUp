@@ -1,34 +1,27 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
+<form action="" method="post" style="margin-right: 25%; margin-left: 25%">
+    {% csrf_token %}
     <h1>Login</h1>
-    <form>
-        {% csrf_token %}
-        <div class="ui form">
-            <div class="ui field">
-                <label>Enter your username</label>
-                <label>
-                    <input type="text" placeholder="username"/>
-                </label>
-
-            </div>
-            <div class="ui field">
-                <label>Enter your email</label>
-                <label>
-                    <input type="email" placeholder="username"/>
-                </label>
-
-            </div>
-                <div class="ui field">
-        <label>Enter your password</label>
-        <label>
-            <input type="password" placeholder="username"/>
-        </label>
-
-    </div>
-
+    <div class="ui form">
+        <div class="ui field">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {% if form.username.errors %}
+            <p style="color: red;">{{ form.username.errors|join:", " }}</p>
+            {% endif %}
         </div>
-    </form>
+        <div class="ui field">
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            {% if form.password.errors %}
+            <p style="color: red;">{{ form.password.errors|join:", " }}</p>
+            {% endif %}
+        </div>
+        <small>Don't you have an account? <a href="{% url 'profiles:register' %}">Register here</a></small><br><br>
+        <button type="submit" class="ui primary button">Login</button>
+    </div>
+</form>
 
 {% endblock content %}
